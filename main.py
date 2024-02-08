@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 permissoes = discord.Intents.default()
 permissoes.message_content = True
 permissoes.members = True
@@ -7,22 +8,41 @@ bot = commands.Bot(command_prefix=".", intents=permissoes)
 
 @bot.event
 async def on_ready():
+    await bot.tree.sync()
     print("Estou pronto!")
 
 @bot.command()
-async def ola(ctx:commands.Context):
-    usuario = ctx.author
-    canal = ctx.channel
-    await ctx.reply(f"Olá, {usuario.display_name}\nVocê está no canal: {canal.name}")
+async def sincronizar(ctx:commands.Context):
+    if ctx.author.id == 1037315487358529586:
+        server = discord.Object(id=1177347390844436554)
+        sincs = await bot.tree.sync(guild=server)
+        await ctx.reply(f"{len(sincs)} comandos sincronizados")
+    else:
+        await ctx.reply('Apenas o meu dono pode usar esse comando!')
 
-@bot.command()
-async def somar(ctx:commands.Context, num1:float, num2:float):
-    res = num1 + num2
-    await ctx.reply(f"A soma de {num1} + {num2} é igual a {res}")
+@bot.tree.command(description='Responde o usuário com olá')
+async def ola(interact:discord.Interaction):
+    await interact.response.send_message(f'Olá, {interact.user.name}')
+    await interact.followup.send(f'Bom te ver de novo!')
 
-@bot.command()
-async def falar(ctx:commands.Context, *,frase):
-    await ctx.send(frase)
+@bot.tree.command(description='Soma dois números')
+@app_commands.describe(num1="O primeiro número a ser somado", num2="O segundo número a ser somado")
+async def somar(interact:discord.Interaction, num1:float, num2:float):
+    resultado = num1 + num2
+    await interact.response.send_message(f"A soma de {num1} e {num2} é {resultado}")
+    
+@bot.tree.command(description='Envia uma mensagem contendo o que o usuário digitou')
+async def falar(interact:discord.Interaction, frase:str):
+    await interact.response.send_message(frase)
+
+@bot.tree.command()
+@app_commands.choices(cor=[
+    app_commands.Choice(name='Vermelho', value='BA2D0B'),
+    app_commands.Choice(name='Azul', value='22577A'),
+    app_commands.Choice(name='Amarelo', value='FFC145')
+])
+async def cor(interact:discord.Interaction, cor:app_commands.Choice[str]):
+    await interact.response.send_message(f"O código hexadecimal da cor {cor.name} é {cor.value}")
 
 @bot.command()
 async def enviar_embed(ctx:commands.Context):
@@ -76,4 +96,4 @@ async def on_member_join(membro:discord.Member):
 async def on_member_remove(membro:discord.Member):
     canal = bot.get_channel(1196465713465008208)
     await canal.send(f"{membro.display_name} Saiu no servidor...\nAté Breve!")
-bot.run("")
+bot.run("MTE3OTc1NDI5NDUzNTI1ODE5Mw.GTqaB8.Wty5bFIQixn3PQevYKYEss5_6Dl30VulamNMcc")
