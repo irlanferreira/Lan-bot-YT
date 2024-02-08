@@ -96,4 +96,4 @@ async def on_member_join(membro:discord.Member):
 async def on_member_remove(membro:discord.Member):
     canal = bot.get_channel(1196465713465008208)
     await canal.send(f"{membro.display_name} Saiu no servidor...\nAté Breve!")
-bot.run("MTE3OTc1NDI5NDUzNTI1ODE5Mw.GTqaB8.Wty5bFIQixn3PQevYKYEss5_6Dl30VulamNMcc")
+bot.run("")
